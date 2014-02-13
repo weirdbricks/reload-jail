@@ -17,6 +17,12 @@ create_jail(){
 	awk '{ gsub("export jail_jail1_parameters=\"\"","export jail_jail1_parameters=\"allow.raw_sockets=1 allow.sysvipc=1\"" ) ; print }' /usr/local/etc/ezjail/jail1 > /usr/local/etc/ezjail/jail1-edited
 	rm /usr/local/etc/ezjail/jail1
 	mv /usr/local/etc/ezjail/jail1-edited /usr/local/etc/ezjail/jail1
+        echo "modifying SSHd configuration"
+	awk '{ gsub("#ListenAddress 0.0.0.0","ListenAddress 192.168.2.20" ) ; print }' /usr/jails/jail1/etc/ssh/sshd_config > /usr/jails/jail1/etc/ssh/sshd_config_edited
+	rm /usr/jails/jail1/etc/ssh/sshd_config
+	mv /usr/jails/jail1/etc/ssh/sshd_config_edited /usr/jails/jail1/etc/ssh/sshd_config
+        echo "setting SSH to start"
+	echo 'sshd_enable="YES"' > /usr/jails/jail1/etc/rc.conf
 	echo "OK: jail ready to use - starting it up"
         ezjail-admin start jail1
 }
