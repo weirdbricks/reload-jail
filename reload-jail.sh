@@ -11,6 +11,12 @@ create_jail(){
         rm /usr/jails/jail1/usr/bin
         echo "copy the /usr/bin/ directory"
         cp -R -p /usr/jails/basejail/usr/bin /usr/jails/jail1/usr/ > /dev/null
+	echo "remove /usr/ports from jail"
+	rm /usr/jails/jail1/usr/ports
+	echo "create directory to mount host's ports in"
+	mkdir /usr/jails/jail1/usr/ports
+	echo "mounting host's ports"
+	mount_nullfs -o ro /usr/ports/ /usr/jails/jail1/usr/ports
 	echo "creating ifconfig alias for 192.168.2.20"
 	ifconfig re0 alias 192.168.2.20 netmask 255.255.255.0
 	echo "modifying /usr/local/etc/ezjail/jail1 to allow pinging"
@@ -30,6 +36,8 @@ create_jail(){
 delete_jail(){
 	echo "stopping the jail"
 	ezjail-admin stop jail1
+	echo "unmount ports"
+	umount /usr/jails/jail1/ports
 	echo "deleting the jail"
 	ezjail-admin delete jail1
 	echo "fixing permissions"
