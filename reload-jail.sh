@@ -4,20 +4,19 @@ jail1_status=`ezjail-admin list | grep jail1 | grep -v grep |wc -l`
 
 create_jail(){
 	echo "creating jail1"
-  	ezjail-admin create jail1 192.168.2.20
+  	ezjail-admin create jail1 192.168.2.20 > /dev/null 2>&1
         echo "copying resolv.conf file"
         cp /etc/resolv.conf /usr/jails/jail1/etc/resolv.conf
         echo "remove /usr/bin symlink"
         rm /usr/jails/jail1/usr/bin
         echo "copy the /usr/bin/ directory"
-        cp -R -p /usr/jails/basejail/usr/bin /usr/jails/jail1/usr/
+        cp -R -p /usr/jails/basejail/usr/bin /usr/jails/jail1/usr/ > /dev/null
 	echo "creating ifconfig alias for 192.168.2.20"
 	ifconfig re0 alias 192.168.2.20 netmask 255.255.255.0
 	echo "modifying /usr/local/etc/ezjail/jail1 to allow pinging"
-	cd /usr/local/etc/ezjail/
-	awk '{ gsub("export jail_jail1_parameters=\"\"","export jail_jail1_parameters=\"allow.raw_sockets=1 allow.sysvipc=1\"" ) ; print }' jail1 > jail1-edited
-	rm jail1
-	mv jail1-edited jail1
+	awk '{ gsub("export jail_jail1_parameters=\"\"","export jail_jail1_parameters=\"allow.raw_sockets=1 allow.sysvipc=1\"" ) ; print }' /usr/local/etc/ezjail/jail1 > /usr/local/etc/ezjail/jail1-edited
+	rm /usr/local/etc/ezjail/jail1
+	mv /usr/local/etc/ezjail/jail1-edited /usr/local/etc/ezjail/jail1
 	echo "OK: jail ready to use - starting it up"
         ezjail-admin start jail1
 }
@@ -32,6 +31,7 @@ delete_jail(){
 	echo "deleting remaining files"
 	rm -r -f /usr/jails/jail1
 	echo "jail completely deleted"
+
 }
 
 
