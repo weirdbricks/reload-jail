@@ -25,10 +25,18 @@ create_jail(){
 	mv /usr/local/etc/ezjail/jail1-edited /usr/local/etc/ezjail/jail1
         echo "modifying SSHd configuration"
 	awk '{ gsub("#ListenAddress 0.0.0.0","ListenAddress 192.168.2.20" ) ; print }' /usr/jails/jail1/etc/ssh/sshd_config > /usr/jails/jail1/etc/ssh/sshd_config_edited
-	rm /usr/jails/jail1/etc/ssh/sshd_config
-	mv /usr/jails/jail1/etc/ssh/sshd_config_edited /usr/jails/jail1/etc/ssh/sshd_config
+        rm /usr/jails/jail1/etc/ssh/sshd_config
+	awk '{ gsub("#PermitRootLogin no","PermitRootLogin yes"); print }' /usr/jails/jail1/etc/ssh/sshd_config_edited > /usr/jails/jail1/etc/ssh/sshd_config
+#	mv /usr/jails/jail1/etc/ssh/sshd_config_edited /usr/jails/jail1/etc/ssh/sshd_config
         echo "setting SSH to start"
 	echo 'sshd_enable="YES"' > /usr/jails/jail1/etc/rc.conf
+        echo 'creating directory for ssh'
+	mkdir /usr/jails/jail1/root/.ssh
+        echo "copying ansible-master's key"
+	cat /usr/jails/ansible-master/root/.ssh/id_rsa.pub >> /usr/jails/jail1/root/.ssh/authorized_keys
+        echo "setting correct SSH key permissions"
+        chmod 600 /usr/jails/jail1/root/.ssh/*
+	chmod 700 /usr/jails/jail1/root
 	echo "OK: jail ready to use - starting it up"
         ezjail-admin start jail1
 }
@@ -37,7 +45,7 @@ delete_jail(){
 	echo "stopping the jail"
 	ezjail-admin stop jail1
 	echo "unmount ports"
-	umount /usr/jails/jail1/ports
+	umount /usr/jails/jail1/usr/ports
 	echo "deleting the jail"
 	ezjail-admin delete jail1
 	echo "fixing permissions"
@@ -47,8 +55,6 @@ delete_jail(){
 	echo "jail completely deleted"
 
 }
-
-
 
 if [ $jail1_status -eq 0 ];
 then 
