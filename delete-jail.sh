@@ -1,12 +1,13 @@
 #!/usr/bin/env sh
 jail=$1
-ipaddress=`ezjail-admin list | grep $jail | awk '{print $3}'`
 
 if [ -z "$jail" ]
 then
   echo "jail name not provided - stopping"
   exit
 fi
+
+ipaddress=`ezjail-admin list | grep $jail | awk '{print $3}'`
 
 echo "checking if jail: $jail is running.."
 jail_status=`ezjail-admin list | grep $jail | grep -v grep | wc -l`
