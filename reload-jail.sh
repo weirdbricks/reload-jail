@@ -75,6 +75,9 @@ create_jail(){
 	echo "OK: jail: $jail ready to use - starting it up"
         ezjail-admin start $jail || notify
 	echo "Jail: $jail started - bootstrapping pkg manager"
+        jexec $jail csh -c "cd /usr/ports/ports-mgmt/pkg ; make install clean > /dev/null" || notify
+        echo "installing python"
+        jexec $jail csh -c "yes | pkg install python"
 }
 
 delete_jail(){
